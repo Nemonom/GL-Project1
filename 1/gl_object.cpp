@@ -6,7 +6,6 @@ gl_object::gl_object()
 	srand(time(NULL));
 }
 
-
 gl_object::~gl_object()
 {
 }
@@ -42,7 +41,7 @@ void gl_object::draw(int i)
 {
 	if (i == 0)
 	{
-		glBegin(GL_POLYGON);
+		glBegin(GL_LINE_LOOP);
 		for (int i = 0; i < polygon; ++i)
 		{
 			glColor4f(0.4 + 0.1 * i, 0.8 - 0.1 * i, 1.0 - 0.1 * i, 1.0f);//Á¡»ö
@@ -73,7 +72,7 @@ void gl_object::move()
 			{
 				dot[i][0] += spd;;
 			} 
-			if (dot[4][0] > 350)
+			if (dot[3][0] > 350)
 				turn = true;
 		}
 		else if (turn)
@@ -93,11 +92,28 @@ void gl_object::move()
 	{
 		for (int i = 0; i < polygon; ++i)
 		{
-			dot[i][1] -= 2;
+			dot[i][1] -= 10;
 		}
 	}
-}
+	else if (status == 3)
+	{
+		if (!turn)
+		{
+			for (int i = 0; i < polygon; ++i)
+			{
+				dot[i][0] += spd;;
+			}		
+		}
+		else if (turn)
+		{
+			for (int i = 0; i < polygon; ++i)
+			{
+				dot[i][0] -= spd;;
+			}
+		}
+	}
 
+}
 
 bool gl_object::operator>(const gl_object &p) const
 {

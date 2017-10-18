@@ -3,7 +3,9 @@
 #include <iostream>
 #include <time.h>
 #include <math.h>
+#include <cmath>
 
+using namespace std;
 
 class gl_object
 {
@@ -29,8 +31,16 @@ public:
 	void set_polygon(int p) { polygon = p; }
 	void set_dot_x(int i, float x) { dot[i][0] = x; }
 	void set_dot_y(int i, float y) { dot[i][0] = y; }
-
-
+	//void set_dot(const POINT& p, int i)
+	//{ 
+	//	dot[i][0] = p.x, dot[i][1] = p.y; 
+	//}
+	void set_dot(float x, float y, int i)
+	{
+		dot[i][0] = x, dot[i][1] = y;
+	}
+	void set_status(int s) { status = s; }
+	
 	float get_dot_x(int i) { return dot[i][0]; }
 	float get_dot_y(int i) { return dot[i][1]; }
 	float get_x() { return m_x; }

@@ -1,7 +1,6 @@
 #pragma once
 #include <iostream>
 #include <cmath>
-#include <cmath> 
 using namespace std; 
 #define EPSILON 0.0001
 /* 먼저 벡터를 표현하는 구조체를 정의합니다. */ 

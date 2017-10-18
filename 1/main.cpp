@@ -40,7 +40,7 @@ POINT p_parent[4];
 POINT p_line[2];
 
 //vector2 p1, p2, p3, p4;
-POINT a1, a2, a3, a4; // 저장용 포인트
+POINT a1, a2; // 저장용 포인트
 
 bool cut_success = false; // 자름
 bool in_success = false; // 들어감
@@ -48,7 +48,7 @@ bool in_success = false; // 들어감
 int collision = 0;
 float mouse_dot[2][2] = { 0 };
 
-int collision_case = 0; // 어떻게 부딪힘?
+int cut_case = 0; // 어떻게 부딪힘?
 
 
 
@@ -58,6 +58,8 @@ void main(int argc, char *argv[]) {
 
 	parent.set_r(rand() % 15 + 20, rand() % 15 + 20);
 	parent.init(4, 1, 0, 200);
+	child.set_r(0, 0);
+	child.init(4, 1, 0, 200);
 	bottle.set_r(100, 50);
 	bottle.init(4, 1, 0, -200);
 
@@ -80,9 +82,11 @@ GLvoid drawScene(GLvoid) {
 
 	bottle.move();
 	parent.move();
+	child.move();
 
 	bottle.draw(1);
 	parent.draw(0);
+	child.draw(0);
 
 	if (collision == 1)
 		draw_line();
@@ -103,6 +107,8 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 	case'p':
 		parent.set_r(rand() % 20 + 20, rand() % 20 + 20);
 		parent.init(4, 1, 0, 200);
+		child.set_r(0, 0);
+		child.init(4, 1, 0, 200);
 		bottle.init(4, 1, 0, -200);
 		cut_success = false;
 		in_success = false;
@@ -125,41 +131,55 @@ void Motion(int x, int y)
 
 void Mouse(int button, int state, int x, int y)
 {
-	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && collision == 0)
+	if (!cut_success)
 	{
-		mouse_dot[collision][0] = x - width/2;
-		mouse_dot[collision][1] = -(y - height/2);
-		mouse_dot[collision+1][0] = x - width / 2;
-		mouse_dot[collision+1][1] = -(y - height / 2);
-		collision++;
-	}
+		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && collision == 0)
+		{
+			mouse_dot[collision][0] = x - width / 2;
+			mouse_dot[collision][1] = -(y - height / 2);
+			mouse_dot[collision + 1][0] = x - width / 2;
+			mouse_dot[collision + 1][1] = -(y - height / 2);
+			collision++;
+		}
 
 
-	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP)
-	{
-		mouse_dot[collision][0] = x - width/2;
-		mouse_dot[collision][1] = -(y - height/2);
+		if (button == GLUT_LEFT_BUTTON && state == GLUT_UP)
+		{
+			mouse_dot[collision][0] = x - width / 2;
+			mouse_dot[collision][1] = -(y - height / 2);
 
 
-	//	///////////벡터용
-	//	line[0].put_x(mouse_dot[0][0]);
-	//	line[0].put_y(mouse_dot[0][1]);		
-	//	line[1].put_x(mouse_dot[1][0]);
-	//	line[1].put_y(mouse_dot[1][1]);
+			//	///////////벡터용
+			//	line[0].put_x(mouse_dot[0][0]);
+			//	line[0].put_y(mouse_dot[0][1]);		
+			//	line[1].put_x(mouse_dot[1][0]);
+			//	line[1].put_y(mouse_dot[1][1]);
 
 
 
-		//////////////포인트용
-		p_line[0].x = mouse_dot[0][0];
-		p_line[0].y = mouse_dot[0][1];
-		p_line[1].x = mouse_dot[1][0];
-		p_line[1].y = mouse_dot[1][1];
+				//////////////포인트용
+			p_line[0].x = mouse_dot[0][0];
+			p_line[0].y = mouse_dot[0][1];
+			p_line[1].x = mouse_dot[1][0];
+			p_line[1].y = mouse_dot[1][1];
 
-		isthattrue();
+			isthattrue();
 
-		collision = 0;
+			collision = 0;
 
-	}
+			if (parent.operator>(child))
+			{
+				child.set_status(2);
+				parent.set_status(3);
+			}
+			else
+			{
+				child.set_status(3);
+				parent.set_status(2);
+			}
+
+		}
+	} // 안잘렸으면 선 그려
 }
 
 void TimerFunction(int value) {
@@ -199,10 +219,66 @@ bool isthattrue()
 	///////////포인트
 	GetIntersectPoint(p_parent[0], p_parent[1], p_line[0], p_line[1], &a1);
 	GetIntersectPoint(p_parent[2], p_parent[3], p_line[0], p_line[1], &a2);
-	GetIntersectPoint(p_parent[0], p_parent[3], p_line[0], p_line[1], &a3);
-	GetIntersectPoint(p_parent[1], p_parent[2], p_line[0], p_line[1], &a4);
+
+	if (a1.x == p_parent[1].x && a2.x == p_parent[2].x)
+	{
+		cut_case = 1;
+		cut();
+		return true;
+	}
+
+	GetIntersectPoint(p_parent[0], p_parent[3], p_line[0], p_line[1], &a1);
+	GetIntersectPoint(p_parent[1], p_parent[2], p_line[0], p_line[1], &a2);
+
+	if (a1.y == p_parent[0].y && a2.y == p_parent[1].y)
+	{
+		cut_case = 2;
+		cut();
+		return true;
+	}
+
+	GetIntersectPoint(p_parent[0], p_parent[1], p_line[0], p_line[1], &a1);
+	GetIntersectPoint(p_parent[1], p_parent[2], p_line[0], p_line[1], &a2);
+
+	if (a1.x == p_parent[0].x && a2.y == p_parent[1].y)
+	{
+		cut_case = 3;
+		cut();
+		return true;
+	}
 
 
+	GetIntersectPoint(p_parent[0], p_parent[3], p_line[0], p_line[1], &a1);
+	GetIntersectPoint(p_parent[0], p_parent[1], p_line[0], p_line[1], &a2);
+
+	if (a1.y == p_parent[0].y && a2.x == p_parent[0].x)
+	{
+		cut_case = 4;
+		cut();
+		return true;
+	}
+
+
+	GetIntersectPoint(p_parent[0], p_parent[3], p_line[0], p_line[1], &a1);
+	GetIntersectPoint(p_parent[2], p_parent[3], p_line[0], p_line[1], &a2);
+
+	if (a1.y == p_parent[0].y && a2.x == p_parent[2].x)
+	{
+		cut_case = 5;
+		cut();
+		return true;
+	}
+
+
+	GetIntersectPoint(p_parent[2], p_parent[3], p_line[0], p_line[1], &a1);
+	GetIntersectPoint(p_parent[1], p_parent[2], p_line[0], p_line[1], &a2);
+
+	if (a1.x == p_parent[2].x && a2.y == p_parent[2].y)
+	{
+		cut_case = 6;
+		cut();
+		return true;
+	}
 	/////////////벡터
 	//segmentIntersection(v_parent[0], v_parent[1], line[0], line[1], p1);
 	//segmentIntersection(v_parent[2], v_parent[3], line[0], line[1], p2);
@@ -215,5 +291,78 @@ bool isthattrue()
 
 void cut()
 {
+	switch (cut_case)
+	{
+	case 1:
+		child.set_dot(a1.x, a1.y, 0);
+		child.set_dot(p_parent[1].x, p_parent[1].y, 1);
+		child.set_dot(p_parent[2].x, p_parent[2].y, 2);
+		child.set_dot(a2.x, a2.y, 3);
 
+		parent.set_dot(a1.x, a1.y, 1);
+		parent.set_dot(a2.x, a2.y, 2);
+		break;
+
+	case 2:
+		child.set_dot(a1.x, a1.y, 0);
+		child.set_dot(a2.x, a2.y, 1);
+		child.set_dot(p_parent[2].x, p_parent[2].y, 2);
+		child.set_dot(p_parent[3].x, p_parent[3].y, 3);
+
+		parent.set_dot(a1.x, a1.y, 3);
+		parent.set_dot(a2.x, a2.y, 2);
+		break;
+
+	case 3:
+		child.set_dot(a1.x, a1.y, 0);
+		child.set_dot(p_parent[1].x, p_parent[1].y, 1);
+		child.set_dot(a2.x, a2.y, 2);
+		child.set_polygon(3);
+
+		parent.set_dot(p_parent[0].x, p_parent[0].y, 0);
+		parent.set_dot(a1.x, a1.y, 1);
+		parent.set_dot(a2.x, a2.y, 2);
+		parent.set_dot(p_parent[2].x, p_parent[2].y, 3);
+		parent.set_dot(p_parent[3].x, p_parent[3].y, 4);
+		parent.set_polygon(5);
+		break;
+	case 4:
+		child.set_dot(a1.x, a1.y, 0);
+		child.set_dot(p_parent[0].x, p_parent[0].y , 1);
+		child.set_dot(a2.x, a2.y, 2);
+		child.set_polygon(3);
+
+		parent.set_dot(a1.x, a1.y, 0);
+		parent.set_dot(a2.x, a2.y, 1);
+		parent.set_dot(p_parent[1].x, p_parent[1].y, 2);
+		parent.set_dot(p_parent[2].x, p_parent[2].y, 3);
+		parent.set_dot(p_parent[3].x, p_parent[3].y, 4);
+		parent.set_polygon(5);
+		break;
+
+	case 5:
+		child.set_dot(a1.x, a1.y, 0);
+		child.set_dot(a2.x, a2.y, 1);
+		child.set_dot(p_parent[3].x, p_parent[3].y, 2);
+		child.set_polygon(3);
+
+		parent.set_dot(a1.x, a1.y, 4);
+		parent.set_dot(a2.x, a2.y, 3);		
+		parent.set_polygon(5);
+		break;
+
+	case 6:
+		child.set_dot(a1.x, a1.y, 0);
+		child.set_dot(a2.x, a2.y, 1);
+		child.set_dot(p_parent[2].x, p_parent[2].y, 2);
+		child.set_polygon(3);
+
+		parent.set_dot(a1.x, a1.y, 3);
+		parent.set_dot(a2.x, a2.y, 2);
+		parent.set_dot(p_parent[3].x, p_parent[3].y, 4);
+		parent.set_polygon(5);
+		break;
+	}
+
+	cut_success = true;
 }
