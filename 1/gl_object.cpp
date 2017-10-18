@@ -23,17 +23,17 @@ void gl_object::init(int p, int s, float x, float y)
 
 	turn = false;
 
-	dot[0][0] = m_x - r;
-	dot[0][1] = m_y + r;
+	dot[0][0] = m_x - x_r;
+	dot[0][1] = m_y + y_r;
 
-	dot[1][0] = m_x - r;
-	dot[1][1] = m_y - r;
+	dot[1][0] = m_x - x_r;
+	dot[1][1] = m_y - y_r;
 
-	dot[2][0] = m_x + r;
-	dot[2][1] = m_y - r;
+	dot[2][0] = m_x + x_r;
+	dot[2][1] = m_y - y_r;
 
-	dot[3][0] = m_x + r;
-	dot[3][1] = m_y + r;
+	dot[3][0] = m_x + x_r;
+	dot[3][1] = m_y + y_r;
 
 	dot[4][0] = dot[3][0];
 	dot[4][1] = dot[3][1];
