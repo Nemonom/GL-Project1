@@ -62,6 +62,10 @@ void main(int argc, char *argv[]) {
 	child.init(4, 1, 0, 200);
 	bottle.set_r(100, 50);
 	bottle.init(4, 1, 0, -200);
+	water.set_r(100, 25);
+	water.init(4, 1, 0, -225);
+	water.set_spd(bottle.get_spd());
+	water.set_status(5);
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);  // 디스플레이 모드 설정
@@ -81,10 +85,39 @@ GLvoid drawScene(GLvoid) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	bottle.move();
+	water.move();
 	parent.move();
 	child.move();
 
+
+	if (parent.get_dot_y(1) >= water.get_dot_y(1)
+		&& parent.get_dot_y(1) <= water.get_dot_y(1) + 20
+		&& parent.get_dot_x(1) > water.get_dot_x(1)
+		&& parent.get_dot_x(1) < water.get_dot_x(2)
+		&& parent.get_dot_x(2) < water.get_dot_x(2)
+		&& parent.get_dot_x(2) > water.get_dot_x(1)
+		)
+	{
+		water.set_status(4);
+		bottle.set_status(4);
+		parent.set_status(4);
+	}
+	if (child.get_dot_y(1) >= water.get_dot_y(1)
+		&& child.get_dot_y(1) <= water.get_dot_y(1) + 20
+		&& child.get_dot_x(1) > water.get_dot_x(1)
+		&& child.get_dot_x(1) < water.get_dot_x(2)
+		&& child.get_dot_x(2) < water.get_dot_x(2)
+		&& child.get_dot_x(2) > water.get_dot_x(1)
+		)
+	{
+		water.set_status(4);
+		bottle.set_status(4);			
+		child.set_status(4);
+	}
+
+
 	bottle.draw(1);
+	water.draw(0);
 	parent.draw(0);
 	child.draw(0);
 
@@ -109,7 +142,12 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 		parent.init(4, 1, 0, 200);
 		child.set_r(0, 0);
 		child.init(4, 1, 0, 200);
+
 		bottle.init(4, 1, 0, -200);
+		water.init(4, 1, 0, -235);
+		water.set_spd(bottle.get_spd());
+		water.set_status(5);
+
 		cut_success = false;
 		in_success = false;
 		break;

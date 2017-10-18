@@ -41,13 +41,26 @@ void gl_object::draw(int i)
 {
 	if (i == 0)
 	{
-		glBegin(GL_LINE_LOOP);
-		for (int i = 0; i < polygon; ++i)
+		if (status == 5)
 		{
-			glColor4f(0.4 + 0.1 * i, 0.8 - 0.1 * i, 1.0 - 0.1 * i, 1.0f);//점색
-			glVertex2f(dot[i][0], dot[i][1]);
+			glBegin(GL_POLYGON);
+			for (int i = 0; i < polygon; ++i)
+			{
+				glColor4f(0.9 - 0.1 * i, 0.6 + 0.1 * i, 0.7 + 0.1 * i, 1.0f);//점색
+				glVertex2f(dot[i][0], dot[i][1]);
+			}
+			glEnd();
 		}
-		glEnd();
+		else {
+			glBegin(GL_POLYGON);
+			for (int i = 0; i < polygon; ++i)
+			{
+				glColor4f(0.4 + 0.1 * i, 0.8 - 0.1 * i, 1.0 - 0.1 * i, 1.0f);//점색
+				glVertex2f(dot[i][0], dot[i][1]);
+			}
+			glEnd();
+		}
+
 	}
 
 	if (i == 1)
@@ -71,7 +84,7 @@ void gl_object::move()
 			for (int i = 0; i < polygon; ++i)
 			{
 				dot[i][0] += spd;;
-			} 
+			}
 			if (dot[3][0] > 350)
 				turn = true;
 		}
@@ -85,14 +98,12 @@ void gl_object::move()
 				turn = false;
 		}
 
-	
-
 	}
 	else if (status == 2) // 세로
 	{
 		for (int i = 0; i < polygon; ++i)
 		{
-			dot[i][1] -= 10;
+			dot[i][1] -= 15;
 		}
 	}
 	else if (status == 3)
@@ -102,7 +113,7 @@ void gl_object::move()
 			for (int i = 0; i < polygon; ++i)
 			{
 				dot[i][0] += spd;;
-			}		
+			}
 		}
 		else if (turn)
 		{
@@ -110,6 +121,36 @@ void gl_object::move()
 			{
 				dot[i][0] -= spd;;
 			}
+		}
+	}
+	else if (status == 4)
+	{
+
+	}
+	else if (status == 5) // 물
+	{
+		if (!turn)
+		{
+			for (int i = 0; i < polygon; ++i)
+			{
+				dot[i][0] += spd;;
+			}
+			if (dot[3][0] > 350)
+				turn = true;
+
+			dot[0][1]++;
+			dot[3][1]++;
+		}
+		else if (turn)
+		{
+			for (int i = 0; i < polygon; ++i)
+			{
+				dot[i][0] -= spd;;
+			}
+			if (dot[0][0] < -350)
+				turn = false;
+			dot[0][1]--;
+			dot[3][1]--;
 		}
 	}
 
@@ -150,3 +191,4 @@ bool gl_object::operator>(const gl_object &p) const
 		}
 	}
 }
+

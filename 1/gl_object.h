@@ -40,7 +40,9 @@ public:
 		dot[i][0] = x, dot[i][1] = y;
 	}
 	void set_status(int s) { status = s; }
-	
+	void set_spd(int s) { spd = s; }
+
+	int get_spd() { return spd; }
 	float get_dot_x(int i) { return dot[i][0]; }
 	float get_dot_y(int i) { return dot[i][1]; }
 	float get_x() { return m_x; }
