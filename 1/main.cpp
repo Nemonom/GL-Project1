@@ -2,6 +2,8 @@
 #include <GL/glut.h>    
 #include <Windows.h>
 #include "gl_object.h"
+#include "vector2.h"
+
 using namespace std;
 
 #define width 800
@@ -24,20 +26,31 @@ bool isthattrue();
 void cut();
 void draw_line();
 
+
 ////////////변수
 gl_object bottle;
 gl_object water;
 gl_object parent;
 gl_object child;
 
-vector2 parent[4];
-vector2 line[2];
+//vector2 v_parent[4];
+//vector2 line[2];
+
+POINT p_parent[4];
+POINT p_line[2];
+
+//vector2 p1, p2, p3, p4;
+POINT a1, a2, a3, a4; // 저장용 포인트
 
 bool cut_success = false; // 자름
 bool in_success = false; // 들어감
 
 int collision = 0;
 float mouse_dot[2][2] = { 0 };
+
+int collision_case = 0; // 어떻게 부딪힘?
+
+
 
 void main(int argc, char *argv[]) {
 
@@ -126,7 +139,26 @@ void Mouse(int button, int state, int x, int y)
 	{
 		mouse_dot[collision][0] = x - width/2;
 		mouse_dot[collision][1] = -(y - height/2);
-		collision = 0;;
+
+
+	//	///////////벡터용
+	//	line[0].put_x(mouse_dot[0][0]);
+	//	line[0].put_y(mouse_dot[0][1]);		
+	//	line[1].put_x(mouse_dot[1][0]);
+	//	line[1].put_y(mouse_dot[1][1]);
+
+
+
+		//////////////포인트용
+		p_line[0].x = mouse_dot[0][0];
+		p_line[0].y = mouse_dot[0][1];
+		p_line[1].x = mouse_dot[1][0];
+		p_line[1].y = mouse_dot[1][1];
+
+		isthattrue();
+
+		collision = 0;
+
 	}
 }
 
@@ -153,11 +185,32 @@ void rotate()
 
 bool isthattrue()
 {
+	for (int i = 0; i < 4; ++i)
+	{
+		//////////벡터용
+	//	v_parent[i].put_x(parent.get_dot_x(i));
+	//	v_parent[i].put_y(parent.get_dot_y(i));
+
+		//////////포인트용
+		p_parent[i].x = parent.get_dot_x(i);
+		p_parent[i].y = parent.get_dot_y(i);
+	}	
+
+	///////////포인트
+	GetIntersectPoint(p_parent[0], p_parent[1], p_line[0], p_line[1], &a1);
+	GetIntersectPoint(p_parent[2], p_parent[3], p_line[0], p_line[1], &a2);
+	GetIntersectPoint(p_parent[0], p_parent[3], p_line[0], p_line[1], &a3);
+	GetIntersectPoint(p_parent[1], p_parent[2], p_line[0], p_line[1], &a4);
 
 
+	/////////////벡터
+	//segmentIntersection(v_parent[0], v_parent[1], line[0], line[1], p1);
+	//segmentIntersection(v_parent[2], v_parent[3], line[0], line[1], p2);
+	//segmentIntersection(v_parent[0], v_parent[3], line[0], line[1], p3);
+	//segmentIntersection(v_parent[1], v_parent[2], line[0], line[1], p4);
+	
 
-
-	return true;
+	return false;
 }
 
 void cut()

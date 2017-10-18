@@ -1,7 +1,6 @@
 #include "gl_object.h"
 
 
-
 gl_object::gl_object()
 {
 	srand(time(NULL));
@@ -47,7 +46,7 @@ void gl_object::draw(int i)
 		for (int i = 0; i < polygon; ++i)
 		{
 			glColor4f(0.4 + 0.1 * i, 0.8 - 0.1 * i, 1.0 - 0.1 * i, 1.0f);//점색
-			glVertex2f(dot[i][0] + move_x, dot[i][1] + move_y);
+			glVertex2f(dot[i][0], dot[i][1]);
 		}
 		glEnd();
 	}
@@ -58,7 +57,7 @@ void gl_object::draw(int i)
 		for (int i = 0; i < polygon; ++i)
 		{
 			glColor4f(0.6 - 0.1 * i, 0.4 + 0.1 * i, 0.5 + 0.1 * i, 1.0f);//점색
-			glVertex2f(dot[i][0] + move_x, dot[i][1] + move_y);
+			glVertex2f(dot[i][0], dot[i][1]);
 		}
 		glEnd();
 	}
@@ -70,20 +69,32 @@ void gl_object::move()
 	{
 		if (!turn)
 		{
-			move_x += spd;
-			if (move_x + dot[4][0] > 350)
+			for (int i = 0; i < polygon; ++i)
+			{
+				dot[i][0] += spd;;
+			} 
+			if (dot[4][0] > 350)
 				turn = true;
 		}
 		else if (turn)
 		{
-			move_x -= spd;
-			if (move_x + dot[0][0] < -350)
+			for (int i = 0; i < polygon; ++i)
+			{
+				dot[i][0] -= spd;;
+			}
+			if (dot[0][0] < -350)
 				turn = false;
 		}
+
+	
+
 	}
 	else if (status == 2) // 세로
 	{
-
+		for (int i = 0; i < polygon; ++i)
+		{
+			dot[i][1] -= 2;
+		}
 	}
 }
 
