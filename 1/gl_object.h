@@ -23,6 +23,14 @@ public:
 	int status = 0;
 	bool turn = false;
 
+
+	float water_dot[2][2] = { 0 };
+	void set_water_dot(int i, float x, float y)
+	{
+		water_dot[i][0] = x;
+		water_dot[i][1] = y;
+	}
+
 public:
 	void init(int p, int s, float x, float y);
 	void set_r(float xr, float yr) { x_r = xr; y_r = yr; }
@@ -31,10 +39,6 @@ public:
 	void set_polygon(int p) { polygon = p; }
 	void set_dot_x(int i, float x) { dot[i][0] = x; }
 	void set_dot_y(int i, float y) { dot[i][0] = y; }
-	//void set_dot(const POINT& p, int i)
-	//{ 
-	//	dot[i][0] = p.x, dot[i][1] = p.y; 
-	//}
 	void set_dot(float x, float y, int i)
 	{
 		dot[i][0] = x, dot[i][1] = y;
@@ -48,7 +52,8 @@ public:
 	float get_x() { return m_x; }
 	float get_y() { return m_y; }
 	int get_stsatus() { return status; }
-	
+	int get_polygon() { return polygon; }
+	bool get_turn() { return turn; }
 	// 크기 비교
 	bool operator>(const gl_object &p) const;
 

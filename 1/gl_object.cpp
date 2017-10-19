@@ -51,6 +51,60 @@ void gl_object::draw(int i)
 			}
 			glEnd();
 		}
+		else if (status == 2)
+		{
+			glBegin(GL_POLYGON);
+			for (int i = 0; i < polygon; ++i)
+			{
+				glColor4f(0.4 + 0.1 * i, 0.8 - 0.1 * i, 1.0 - 0.1 * i, 1.0f);//점색
+				glVertex2f(dot[i][0], dot[i][1]);
+			}
+			glEnd();
+
+			glBegin(GL_LINE_LOOP);
+			for (int i = 0; i < polygon; ++i)
+			{
+				glColor4f(1, 0.3, 0.3, 1.0f);//점색
+				glVertex2f(dot[i][0], dot[i][1]);
+			}
+			glEnd();
+		}
+		else if (status == 6 || status == 4)
+		{
+			glBegin(GL_POLYGON);
+			for (int i = 0; i < polygon; ++i)
+			{
+				glColor4f(0.4 + 0.1 * i, 0.8 - 0.1 * i, 1.0 - 0.1 * i, 1.0f);//점색
+				glVertex2f(dot[i][0], dot[i][1]);
+			}
+			glEnd();
+
+			glBegin(GL_LINE_LOOP);			
+			for (int i = 0; i < polygon; ++i)
+			{
+				glColor4f(1, 0.3, 0.3, 1.0f);//점색
+				glVertex2f(dot[i][0], dot[i][1]);
+			}
+			glEnd();
+
+
+			glBegin(GL_LINES);
+			glColor4f(0, 0, 0, 1.0f);//점색
+
+		//	glVertex2f(dot[0][0], water_dot[0][1]);
+
+			for (int i = 0; i < polygon; ++i)
+			{
+				if (dot[i][1] <= water_dot[0][1])
+					glVertex2f(dot[i][0], dot[i][1]);
+			}
+		//	glVertex2f(dot[0][0], water_dot[0][1]);
+
+			glEnd();
+
+
+		}
+
 		else {
 			glBegin(GL_POLYGON);
 			for (int i = 0; i < polygon; ++i)
@@ -99,7 +153,7 @@ void gl_object::move()
 		}
 
 	}
-	else if (status == 2) // 세로
+	else if (status == 2 || status == 6) // 세로
 	{
 		for (int i = 0; i < polygon; ++i)
 		{
@@ -123,7 +177,7 @@ void gl_object::move()
 			}
 		}
 	}
-	else if (status == 4)
+	else if (status == 4) // 멈춰
 	{
 
 	}

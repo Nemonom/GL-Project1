@@ -25,7 +25,7 @@ void Motion(int x, int y);
 bool isthattrue();
 void cut();
 void draw_line();
-
+void follow(gl_object* p);
 
 ////////////변수
 gl_object bottle;
@@ -56,7 +56,7 @@ void main(int argc, char *argv[]) {
 
 	srand(time(NULL));
 
-	parent.set_r(rand() % 15 + 20, rand() % 15 + 20);
+	parent.set_r(rand() % 15 + 20, rand() % 10 + 50);
 	parent.init(4, 1, 0, 200);
 	child.set_r(0, 0);
 	child.init(4, 1, 0, 200);
@@ -84,37 +84,20 @@ GLvoid drawScene(GLvoid) {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);    // 바탕색
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	child.set_water_dot(0, water.get_dot_x(0), water.get_dot_y(0));
+	child.set_water_dot(1, water.get_dot_x(3), water.get_dot_y(3));
+	parent.set_water_dot(0, water.get_dot_x(0), water.get_dot_y(0));
+	parent.set_water_dot(1, water.get_dot_x(3), water.get_dot_y(3));
+
 	bottle.move();
 	water.move();
 	parent.move();
 	child.move();
 
-
-	if (parent.get_dot_y(1) >= water.get_dot_y(1)
-		&& parent.get_dot_y(1) <= water.get_dot_y(1) + 20
-		&& parent.get_dot_x(1) > water.get_dot_x(1)
-		&& parent.get_dot_x(1) < water.get_dot_x(2)
-		&& parent.get_dot_x(2) < water.get_dot_x(2)
-		&& parent.get_dot_x(2) > water.get_dot_x(1)
-		)
-	{
-		water.set_status(4);
-		bottle.set_status(4);
-		parent.set_status(4);
-	}
-	if (child.get_dot_y(1) >= water.get_dot_y(1)
-		&& child.get_dot_y(1) <= water.get_dot_y(1) + 20
-		&& child.get_dot_x(1) > water.get_dot_x(1)
-		&& child.get_dot_x(1) < water.get_dot_x(2)
-		&& child.get_dot_x(2) < water.get_dot_x(2)
-		&& child.get_dot_x(2) > water.get_dot_x(1)
-		)
-	{
-		water.set_status(4);
-		bottle.set_status(4);			
-		child.set_status(4);
-	}
-
+	if (child.get_stsatus() == 2 || child.get_stsatus() == 6)
+		follow(&child);
+	else if (parent.get_stsatus() == 2 || parent.get_stsatus() == 6)
+		follow(&parent);
 
 	bottle.draw(1);
 	water.draw(0);
@@ -123,7 +106,6 @@ GLvoid drawScene(GLvoid) {
 
 	if (collision == 1)
 		draw_line();
-
 
 	glFlush(); // 화면에 출력하기
 }
@@ -137,8 +119,12 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 {
 	switch (key)
 	{
+
+	case 'a':
+		break;
 	case'p':
-		parent.set_r(rand() % 20 + 20, rand() % 20 + 20);
+	case'P':
+		parent.set_r(rand() % 20 + 20, rand() % 10 + 50);
 		parent.init(4, 1, 0, 200);
 		child.set_r(0, 0);
 		child.init(4, 1, 0, 200);
@@ -153,6 +139,7 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 		break;
 
 	case 'q':
+	case 'Q':
 		PostQuitMessage(0);
 		break;
 	}
@@ -379,9 +366,9 @@ void cut()
 		break;
 
 	case 5:
-		child.set_dot(a1.x, a1.y, 0);
-		child.set_dot(a2.x, a2.y, 1);
-		child.set_dot(p_parent[3].x, p_parent[3].y, 2);
+		child.set_dot(p_parent[3].x, p_parent[3].y, 0);
+		child.set_dot(a1.x, a1.y, 1);
+		child.set_dot(a2.x, a2.y, 2);
 		child.set_polygon(3);
 
 		parent.set_dot(a1.x, a1.y, 4);
@@ -403,4 +390,51 @@ void cut()
 	}
 
 	cut_success = true;
+}
+
+void follow(gl_object* p)
+{
+	//같이움직이기
+	if (p->get_dot_x(0) >= bottle.get_dot_x(0)
+		&& p->get_dot_x(0) <= bottle.get_dot_x(2)
+		&& p->get_dot_x(1) >= bottle.get_dot_x(0)
+		&& p->get_dot_x(1) <= bottle.get_dot_x(2)
+		&& p->get_dot_x(2) >= bottle.get_dot_x(0)
+		&& p->get_dot_x(2) <= bottle.get_dot_x(2)
+		&& p->get_dot_y(2) <= bottle.get_dot_y(0) + 10
+		&& p->get_dot_y(2) >= bottle.get_dot_y(0) - 10  
+		&& p->get_stsatus() == 2)
+	{
+		p->set_status(6);
+	}
+
+	if (p->get_stsatus() == 6)
+	{
+		if(bottle.get_turn())
+		{ 
+			for (int i = 0; i < p->get_polygon(); ++i)
+			{
+				p->set_dot_x(i, p->get_dot_x(i) - bottle.get_spd());
+			}
+		}
+		else
+		{
+			for (int i = 0; i < p->get_polygon(); ++i)
+			{
+				p->set_dot_x(i, p->get_dot_x(i) + bottle.get_spd());
+			}
+		}
+
+		if ((p->get_dot_y(1) <= bottle.get_dot_y(2) + 15
+			&& p->get_dot_y(1) >= bottle.get_dot_y(2) - 15)
+			|| (p->get_dot_y(2) <= bottle.get_dot_y(2) + 15
+				&& p->get_dot_y(2) >= bottle.get_dot_y(2) - 15)
+			)
+		{
+			bottle.set_status(4);
+			water.set_status(4);
+			p->set_status(4);
+		}
+	}
+
 }
