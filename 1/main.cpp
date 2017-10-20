@@ -26,6 +26,7 @@ bool isthattrue();
 void cut();
 void draw_line();
 void follow(gl_object* p);
+void water_cut(gl_object* p);
 
 ////////////변수
 gl_object bottle;
@@ -38,10 +39,11 @@ gl_object child;
 
 POINT p_parent[4];
 POINT p_line[2];
-
+POINT p_fall[4];
+POINT p_water[2];
 //vector2 p1, p2, p3, p4;
 POINT a1, a2; // 저장용 포인트
-
+POINT b1, b2;
 bool cut_success = false; // 자름
 bool in_success = false; // 들어감
 
@@ -84,25 +86,26 @@ GLvoid drawScene(GLvoid) {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);    // 바탕색
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	child.set_water_dot(0, water.get_dot_x(0), water.get_dot_y(0));
-	child.set_water_dot(1, water.get_dot_x(3), water.get_dot_y(3));
-	parent.set_water_dot(0, water.get_dot_x(0), water.get_dot_y(0));
-	parent.set_water_dot(1, water.get_dot_x(3), water.get_dot_y(3));
-
-	bottle.move();
-	water.move();
-	parent.move();
-	child.move();
 
 	if (child.get_stsatus() == 2 || child.get_stsatus() == 6)
 		follow(&child);
 	else if (parent.get_stsatus() == 2 || parent.get_stsatus() == 6)
 		follow(&parent);
 
+	bottle.move();
+	water.move();
+	parent.move();
+	child.move();
+
 	bottle.draw(1);
 	water.draw(0);
 	parent.draw(0);
 	child.draw(0);
+
+	if (child.get_stsatus() == 4 || child.get_stsatus() == 6)
+		water_cut(&child);
+	if (parent.get_stsatus() == 4 || parent.get_stsatus() == 6)
+		water_cut(&parent);
 
 	if (collision == 1)
 		draw_line();
@@ -435,6 +438,66 @@ void follow(gl_object* p)
 			water.set_status(4);
 			p->set_status(4);
 		}
+
+	}
+	
+}
+
+void water_cut(gl_object* p)
+{
+	p_water[0].x = water.get_dot_x(0);
+	p_water[0].y = water.get_dot_y(0);
+	p_water[1].x = water.get_dot_x(3);
+	p_water[1].y = water.get_dot_y(3);
+
+	for (int i = 0; i < p->get_polygon(); ++i)
+	{
+		p_fall[i].x = p->get_dot_x(i);
+		p_fall[i].y = p->get_dot_y(i);
 	}
 
+	if (p->get_polygon() == 4)
+	{
+		GetIntersectPoint(p_fall[0], p_fall[1], p_water[0], p_water[1], &b1);
+		GetIntersectPoint(p_fall[2], p_fall[3], p_water[0], p_water[1], &b2);
+	}
+	else if(cut_case == 3 || cut_case == 6)
+	{
+		GetIntersectPoint(p_fall[0], p_fall[1], p_water[0], p_water[1], &b1);
+		GetIntersectPoint(p_fall[0], p_fall[2], p_water[0], p_water[1], &b2);
+	}
+	else if (cut_case == 4 || cut_case == 5)
+	{
+		GetIntersectPoint(p_fall[2], p_fall[0], p_water[0], p_water[1], &b1);
+		GetIntersectPoint(p_fall[2], p_fall[1], p_water[0], p_water[1], &b2);
+	}
+
+	if (b1.y == p_water[1].y && b2.y == p_water[1].y)
+	{
+		glBegin(GL_LINE_LOOP);
+		glColor4f(0, 0, 0, 1.0f);//점색
+		glVertex2f(b1.x, b1.y);
+		for (int i = 0; i < p->get_polygon(); ++i)
+		{
+			if (p->get_dot_y(i) <= b1.y)
+			{
+				glVertex2f(p->get_dot_x(i), p->get_dot_y(i));
+			}
+		}
+		glVertex2f(b2.x, b2.y);
+		glEnd();
+	}
+	else if(p->get_dot_y(0) <= water.get_dot_y(0)
+		&& p->get_dot_y(p->get_polygon()-1) <= water.get_dot_y(0))
+	{
+		glBegin(GL_LINE_LOOP);
+		glColor4f(0, 0, 0, 1.0f);//점색
+		for (int i = 0; i < p->get_polygon(); ++i)
+		{
+			glVertex2f(p->get_dot_x(i), p->get_dot_y(i));	
+		}
+		glEnd();
+	}
+
+	// 클리핑
 }

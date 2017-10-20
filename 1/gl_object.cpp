@@ -86,23 +86,6 @@ void gl_object::draw(int i)
 				glVertex2f(dot[i][0], dot[i][1]);
 			}
 			glEnd();
-
-
-			glBegin(GL_LINES);
-			glColor4f(0, 0, 0, 1.0f);//Á¡»ö
-
-		//	glVertex2f(dot[0][0], water_dot[0][1]);
-
-			for (int i = 0; i < polygon; ++i)
-			{
-				if (dot[i][1] <= water_dot[0][1])
-					glVertex2f(dot[i][0], dot[i][1]);
-			}
-		//	glVertex2f(dot[0][0], water_dot[0][1]);
-
-			glEnd();
-
-
 		}
 
 		else {
